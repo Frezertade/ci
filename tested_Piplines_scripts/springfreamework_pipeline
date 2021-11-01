@@ -1,0 +1,46 @@
+resources:
+- icon: github
+  name: repoconcourse
+  type: git
+  source:
+    uri: https://github.com/concourse/examples.git
+   
+
+- icon: language-java
+  name: javacode
+  type: git
+  source:
+   uri: https://github.com/Frezertade/simpleJava.git
+   trigger: true
+   
+
+jobs:
+- name: buildJob
+  plan:
+  - get: repoconcourse
+    trigger: true
+  - get: javacode
+    trigger: true
+  - task: buildjavacode
+    config:
+      caches:
+      - path: $HOME/.m2/repository
+      platform: linux
+      image_resource:
+        name: ""
+        source:
+          repository: maven
+          tag: 3.6.3
+          username: frezert
+          password: MituFre1242
+        type: registry-image
+      inputs: 
+      - name: javacode
+      output : build
+      run: 
+        args: 
+        - -c
+        - 
+          mvn -B -f javacode/pom.xml compile
+
+        path: /bin/sh
